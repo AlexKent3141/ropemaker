@@ -1,120 +1,4 @@
-#include "ropemaker.h"
-#include "assert.h"
 #include "pthread.h"
-#include "stdlib.h"
-
-/* Begin map implementation. */
-struct thread_map_node
-{
-  pthread_t thread;
-  bool stop;
-  struct thread_map_node* next;
-};
-
-struct thread_map
-{
-  struct thread_map_node* head;
-  struct thread_map_node* tail;
-};
-
-struct thread_map_node* thread_map_find(
-  struct thread_map* map,
-  pthread_t thread)
-{
-  struct thread_map_node* node = map->head;
-  while (node != NULL && pthread_equal(thread, node->thread) == 0)
-  {
-    node = node->next;
-  }
-
-  return node;
-}
-
-void thread_map_add(
-  struct thread_map* map,
-  pthread_t thread)
-{
-  /* First check whether there is already a thread stored in the map with this
-     identifier.
-     I'm concerned about the scenario where we created a thread previously but it
-     didn't get removed from the map, in which case we could theoretically have
-     another thread with the same id. */
-  struct thread_map_node* node = thread_map_find(map, thread);
-  if (node != NULL)
-  {
-    node->stop = false;
-    return;
-  }
-
-  node = (struct thread_map_node*)malloc(sizeof(struct thread_map_node));
-  node->thread = thread;
-  node->stop = false;
-  node->next = NULL;
-
-  if (map->head == NULL)
-  {
-    /* We are creating the first node. */
-    map->head = node;
-    map->tail = node;
-  }
-  else
-  {
-    map->tail->next = node;
-    map->tail = node;
-  }
-}
-
-void thread_map_remove(
-  struct thread_map* map,
-  pthread_t thread)
-{
-  struct thread_map_node* prev = NULL;
-  struct thread_map_node* node = map->head;
-  while (node != NULL && pthread_equal(thread, node->thread) == 0)
-  {
-    prev = node;
-    node = node->next;
-  }
-
-  assert(node != NULL);
-
-  if (prev != NULL)
-  {
-    prev->next = node->next;
-  }
-
-  if (map->head == node)
-  {
-    map->head = node->next;
-  }
-
-  if (map->tail == node)
-  {
-    map->tail = prev;
-  }
-
-  free(node);
-}
-
-void thread_map_destroy(
-  struct thread_map* map)
-{
-  if (map == NULL) return;
-
-  struct thread_map_node* node = map->head;
-  struct thread_map_node* next;
-  while (node != NULL)
-  {
-    next = node->next;
-    free(node);
-    node = next;
-  }
-
-  map = NULL;
-}
-/* End map implementation  */
-
-static struct thread_map map = { NULL, NULL };
 
 bool rmk_mutex_create(rmk_mutex_t* mutex)
 {
@@ -179,9 +63,14 @@ bool rmk_thread_create(
   return success;
 }
 
+bool thread_equal(pthread_t t1, pthread_t t2)
+{
+  return pthread_equal(t1, t2) != 0;
+}
+
 void rmk_thread_request_stop(rmk_thread_t thread)
 {
-  struct thread_map_node* node = thread_map_find(&map, thread);
+  struct thread_map_node* node = thread_map_find(&map, thread, &thread_equal);
   if (node != NULL)
   {
     node->stop = true;
@@ -191,7 +80,7 @@ void rmk_thread_request_stop(rmk_thread_t thread)
 bool rmk_thread_stop_requested()
 {
   pthread_t thread = pthread_self();
-  struct thread_map_node* node = thread_map_find(&map, thread);
+  struct thread_map_node* node = thread_map_find(&map, thread, &thread_equal);
   return node != NULL
     ? node->stop
     : false;
@@ -200,5 +89,5 @@ bool rmk_thread_stop_requested()
 void rmk_thread_join(rmk_thread_t thread)
 {
   pthread_join(thread, NULL);
-  thread_map_remove(&map, thread);
+  thread_map_remove(&map, thread, &thread_equal);
 }
