@@ -27,16 +27,28 @@ void* calc_primes(void* data)
   }
 }
 
+void* say_hello(void* data)
+{
+  printf("Hello world!\n");
+}
+
 int main()
 {
   int primes[NUM_PRIMES] = { 0 };
 
-  rmk_thread_t worker;
-  rmk_thread_create(&worker, &calc_primes, primes);
+  rmk_thread_init();
 
-  rmk_thread_join(&worker);
+  rmk_thread_t worker1;
+  rmk_thread_create(&worker1, RMK_JOINABLE, &calc_primes, primes);
+
+  rmk_thread_t worker2;
+  rmk_thread_create(&worker2, RMK_DETACHED, &say_hello, NULL);
+
+  rmk_thread_join(worker1);
 
   printf("Got primes, the %dth one is: %d\n", NUM_PRIMES, primes[NUM_PRIMES-1]);
+
+  rmk_thread_shutdown();
 
   return 0;
 }

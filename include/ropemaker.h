@@ -19,21 +19,34 @@ extern "C" {
 
 typedef void*(*rmk_thread_func)(void*);
 
+enum rmk_thread_creation_flags
+{
+  RMK_JOINABLE,
+  RMK_DETACHED
+};
+
 EXPORT bool rmk_mutex_create(rmk_mutex_t*);
 EXPORT void rmk_mutex_lock(rmk_mutex_t*);
 EXPORT void rmk_mutex_unlock(rmk_mutex_t*);
 EXPORT void rmk_mutex_destroy(rmk_mutex_t*);
 
-EXPORT bool rmk_thread_create(rmk_thread_t*, rmk_thread_func, void*);
+EXPORT void rmk_thread_init();
+EXPORT void rmk_thread_shutdown();
+
+EXPORT bool rmk_thread_create(
+  rmk_thread_t*,
+  enum rmk_thread_creation_flags,
+  rmk_thread_func,
+  void*);
 
 /* Signal that the specified thread should stop when it's convenient. */
-EXPORT void rmk_thread_request_stop(rmk_thread_t*);
+EXPORT void rmk_thread_request_stop(rmk_thread_t);
 
 /* Check whether the current thread has been requested to stop. */
 EXPORT bool rmk_thread_stop_requested();
 
 /* Wait for the specified thread to stop. */
-EXPORT void rmk_thread_join(rmk_thread_t*);
+EXPORT void rmk_thread_join(rmk_thread_t);
 
 #ifdef __cplusplus
 }
