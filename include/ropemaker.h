@@ -25,6 +25,8 @@ enum rmk_thread_creation_flags
   RMK_DETACHED
 };
 
+EXPORT void rmk_sleep_ms(int);
+
 EXPORT bool rmk_mutex_create(rmk_mutex_t*);
 EXPORT void rmk_mutex_lock(rmk_mutex_t*);
 EXPORT void rmk_mutex_unlock(rmk_mutex_t*);

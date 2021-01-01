@@ -1,4 +1,14 @@
 #include "pthread.h"
+#include "time.h"
+#include "errno.h"
+
+void rmk_sleep_ms(int ms)
+{
+  struct timespec ts;
+  ts.tv_sec = ms / 1000;
+  ts.tv_nsec = (ms % 1000) * 1000000;
+  while (nanosleep(&ts, &ts) == -1 && errno == EINTR);
+}
 
 bool rmk_mutex_create(rmk_mutex_t* mutex)
 {
@@ -29,6 +39,11 @@ void rmk_thread_shutdown()
   thread_map_destroy(&map);
 }
 
+bool thread_equal(pthread_t t1, pthread_t t2)
+{
+  return pthread_equal(t1, t2) != 0;
+}
+
 bool rmk_thread_create(
   rmk_thread_t* thread,
   enum rmk_thread_creation_flags flags,
@@ -47,25 +62,20 @@ bool rmk_thread_create(
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
   }
 
-  int success = pthread_create(
+  int ret = pthread_create(
     thread,
     &attr,
     func,
-    data) == 0;
+    data);
 
   pthread_attr_destroy(&attr);
 
-  if (success)
+  if (ret == 0)
   {
-    thread_map_add(&map, *thread);
+    thread_map_add(&map, *thread, &thread_equal);
   }
 
-  return success;
-}
-
-bool thread_equal(pthread_t t1, pthread_t t2)
-{
-  return pthread_equal(t1, t2) != 0;
+  return ret == 0;
 }
 
 void rmk_thread_request_stop(rmk_thread_t thread)

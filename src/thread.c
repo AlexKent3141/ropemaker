@@ -23,7 +23,8 @@ struct thread_map_node* thread_map_find(
 
 void thread_map_add(
   struct thread_map* map,
-  rmk_thread_t thread);
+  rmk_thread_t thread,
+  bool (*thread_equal)(rmk_thread_t, rmk_thread_t));
 
 void thread_map_remove(
   struct thread_map* map,
@@ -48,7 +49,7 @@ struct thread_map_node* thread_map_find(
   bool (*thread_equal)(rmk_thread_t, rmk_thread_t))
 {
   struct thread_map_node* node = map->head;
-  while (node != NULL && thread_equal(thread, node->thread))
+  while (node != NULL && !thread_equal(thread, node->thread))
   {
     node = node->next;
   }
@@ -58,14 +59,15 @@ struct thread_map_node* thread_map_find(
 
 void thread_map_add(
   struct thread_map* map,
-  rmk_thread_t thread)
+  rmk_thread_t thread,
+  bool (*thread_equal)(rmk_thread_t, rmk_thread_t))
 {
   /* First check whether there is already a thread stored in the map with this
      identifier.
      I'm concerned about the scenario where we created a thread previously but it
      didn't get removed from the map, in which case we could theoretically have
      another thread with the same id. */
-  struct thread_map_node* node = thread_map_find(map, thread);
+  struct thread_map_node* node = thread_map_find(map, thread, thread_equal);
   if (node != NULL)
   {
     node->stop = false;
@@ -97,7 +99,7 @@ void thread_map_remove(
 {
   struct thread_map_node* prev = NULL;
   struct thread_map_node* node = map->head;
-  while (node != NULL && thread_equal(thread, node->thread))
+  while (node != NULL && !thread_equal(thread, node->thread))
   {
     prev = node;
     node = node->next;
