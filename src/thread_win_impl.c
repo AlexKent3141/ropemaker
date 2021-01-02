@@ -26,15 +26,6 @@ void rmk_mutex_destroy(rmk_mutex_t* mutex)
   CloseHandle(*mutex);
 }
 
-void rmk_thread_init()
-{
-}
-
-void rmk_thread_shutdown()
-{
-  thread_map_destroy(&map);
-}
-
 bool thread_equal(rmk_thread_t t1, rmk_thread_t t2)
 {
   return t1.id == t2.id;

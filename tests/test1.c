@@ -40,8 +40,6 @@ int main()
 {
   int primes[NUM_PRIMES] = { 0 };
 
-  rmk_thread_init();
-
   rmk_thread_t worker1;
   if (!rmk_thread_create(&worker1, RMK_JOINABLE, &calc_primes, primes))
   {
@@ -60,8 +58,6 @@ int main()
 
   printf("Got primes, the %dth one is: %d\n", NUM_PRIMES, primes[NUM_PRIMES-1]);
   fflush(stdout);
-
-  rmk_thread_shutdown();
 
   return 0;
 }

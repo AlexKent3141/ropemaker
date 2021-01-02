@@ -27,8 +27,8 @@ typedef void*(*rmk_thread_func)(void*);
 
 enum rmk_thread_creation_flags
 {
-  RMK_JOINABLE,
-  RMK_DETACHED
+  RMK_JOINABLE = 1,
+  RMK_DETACHED = 2
 };
 
 EXPORT void rmk_sleep_ms(int);
@@ -38,16 +38,14 @@ EXPORT void rmk_mutex_lock(rmk_mutex_t*);
 EXPORT void rmk_mutex_unlock(rmk_mutex_t*);
 EXPORT void rmk_mutex_destroy(rmk_mutex_t*);
 
-EXPORT void rmk_thread_init();
-EXPORT void rmk_thread_shutdown();
-
 EXPORT bool rmk_thread_create(
   rmk_thread_t*,
   enum rmk_thread_creation_flags,
   rmk_thread_func,
   void*);
 
-/* Signal that the specified thread should stop when it's convenient. */
+/* Signal that the specified thread should stop when it's convenient.
+   This can only be used with joinable threads. */
 EXPORT void rmk_thread_request_stop(rmk_thread_t);
 
 /* Check whether the current thread has been requested to stop. */

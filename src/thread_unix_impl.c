@@ -30,15 +30,6 @@ void rmk_mutex_destroy(rmk_mutex_t* mutex)
   pthread_mutex_destroy(mutex);
 }
 
-void rmk_thread_init()
-{
-}
-
-void rmk_thread_shutdown()
-{
-  thread_map_destroy(&map);
-}
-
 bool thread_equal(pthread_t t1, pthread_t t2)
 {
   return pthread_equal(t1, t2) != 0;
@@ -70,7 +61,7 @@ bool rmk_thread_create(
 
   pthread_attr_destroy(&attr);
 
-  if (ret == 0)
+  if (ret == 0 && (flags & RMK_JOINABLE))
   {
     thread_map_add(&map, *thread, &thread_equal);
   }
@@ -80,7 +71,7 @@ bool rmk_thread_create(
 
 void rmk_thread_request_stop(rmk_thread_t thread)
 {
-  struct thread_map_node* node = thread_map_find(&map, thread, &thread_equal);
+  struct thread_map_entry* node = thread_map_find(&map, thread, &thread_equal);
   if (node != NULL)
   {
     node->stop = true;
@@ -90,7 +81,7 @@ void rmk_thread_request_stop(rmk_thread_t thread)
 bool rmk_thread_stop_requested()
 {
   pthread_t thread = pthread_self();
-  struct thread_map_node* node = thread_map_find(&map, thread, &thread_equal);
+  struct thread_map_entry* node = thread_map_find(&map, thread, &thread_equal);
   return node != NULL
     ? node->stop
     : false;

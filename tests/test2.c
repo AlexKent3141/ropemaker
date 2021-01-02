@@ -38,8 +38,6 @@ estimate for pi.
 */
 int main()
 {
-  rmk_thread_init();
-
   rmk_thread_t worker1, worker2, worker3;
   double result1, result2, result3;
 
@@ -84,8 +82,6 @@ int main()
 
   printf("Worker3 estimates: %.10lf, error: %.10lf\n", result3, error(result3));
   fflush(stdout);
-
-  rmk_thread_shutdown();
 
   return 0;
 }

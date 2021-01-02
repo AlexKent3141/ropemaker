@@ -54,8 +54,6 @@ int main()
     return -1;
   }
 
-  rmk_thread_init();
-
   struct caller_data bob = { "Bob", 0 };
   struct caller_data claire = { "Claire", 0 };
 
@@ -64,14 +62,12 @@ int main()
   if (!rmk_thread_create(&bth, RMK_JOINABLE, &bob_worker, &bob))
   {
     printf("Failed to create Bob's thread\n");
-    rmk_thread_shutdown();
     return -2;
   }
 
   if (!rmk_thread_create(&cth, RMK_JOINABLE, &claire_worker, &claire))
   {
     printf("Failed to create Claire's thread\n");
-    rmk_thread_shutdown();
     return -3;
   }
 
@@ -82,8 +78,6 @@ int main()
 
   rmk_thread_join(bth);
   rmk_thread_join(cth);
-
-  rmk_thread_shutdown();
 
   printf("Alice received %d calls\n", alice_total_calls);
   printf("%d of them were from Bob\n", bob.num_calls_made);
