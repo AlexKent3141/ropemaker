@@ -51,8 +51,10 @@ bool rmk_thread_create(
     {
       CloseHandle(thread->handle);
     }
-
-    thread_map_add(&map, *thread, &thread_equal);
+    else
+    {
+      thread_map_add(&map, *thread, &thread_equal);
+    }
   }
 
   return thread->handle != NULL;
