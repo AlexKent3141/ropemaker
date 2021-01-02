@@ -60,10 +60,10 @@ bool rmk_thread_create(
 
 void rmk_thread_request_stop(rmk_thread_t thread)
 {
-  struct thread_map_node* node = thread_map_find(&map, thread, &thread_equal);
-  if (node != NULL)
+  struct thread_map_entry* entry = thread_map_find(&map, thread, &thread_equal);
+  if (entry != NULL)
   {
-    node->stop = true;
+    entry->stop = true;
   }
 }
 
@@ -71,9 +71,9 @@ bool rmk_thread_stop_requested()
 {
   DWORD id = GetCurrentThreadId();
   rmk_thread_t thread = { NULL, id };
-  struct thread_map_node* node = thread_map_find(&map, thread, &thread_equal);
-  return node != NULL
-    ? node->stop
+  struct thread_map_entry* entry = thread_map_find(&map, thread, &thread_equal);
+  return entry != NULL
+    ? entry->stop
     : false;
 }
 
