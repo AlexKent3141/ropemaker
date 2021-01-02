@@ -12,7 +12,7 @@ void rmk_sleep_ms(int ms)
 
 bool rmk_mutex_create(rmk_mutex_t* mutex)
 {
-  pthread_mutex_init(mutex, NULL);
+  return pthread_mutex_init(mutex, NULL) == 0;
 }
 
 void rmk_mutex_lock(rmk_mutex_t* mutex)
