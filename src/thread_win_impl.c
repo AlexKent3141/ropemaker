@@ -7,7 +7,7 @@ void rmk_sleep_ms(int ms)
 
 bool rmk_mutex_create(rmk_mutex_t* mutex)
 {
-  *mutex = CreateMutexA(NULL, TRUE, NULL);
+  *mutex = CreateMutexA(NULL, FALSE, NULL);
   return *mutex != NULL;
 }
 

@@ -12,3 +12,10 @@ add_executable(test2
 target_link_libraries(test2
   PRIVATE
     ropemaker)
+
+add_executable(test3
+  test3.c)
+
+target_link_libraries(test3
+  PRIVATE
+    ropemaker)
