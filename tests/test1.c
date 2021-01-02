@@ -25,11 +25,15 @@ void* calc_primes(void* data)
 
     ++p;
   }
+
+  return NULL;
 }
 
 void* say_hello(void* data)
 {
   printf("Hello world!\n");
+  fflush(stdout);
+  return NULL;
 }
 
 int main()
@@ -55,6 +59,7 @@ int main()
   rmk_thread_join(worker1);
 
   printf("Got primes, the %dth one is: %d\n", NUM_PRIMES, primes[NUM_PRIMES-1]);
+  fflush(stdout);
 
   rmk_thread_shutdown();
 

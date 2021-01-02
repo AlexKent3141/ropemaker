@@ -5,7 +5,13 @@
 
 #ifdef _MSC_VER
 #define EXPORT __declspec(dllexport)
-/* TODO */
+#include "windows.h"
+typedef HANDLE rmk_mutex_t;
+typedef struct
+{
+  HANDLE handle;
+  DWORD id;
+} rmk_thread_t;
 #elif __GNUC__
 #define EXPORT __attribute__ ((visibility("default")))
 #include "pthread.h"

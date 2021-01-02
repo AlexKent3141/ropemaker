@@ -1,3 +1,5 @@
+#define _USE_MATH_DEFINES
+
 #include "ropemaker.h"
 #include "math.h"
 #include "stdio.h"
@@ -19,6 +21,8 @@ void* calc_pi(void* data)
 
   double* res = (double*)data;
   *res = total;
+
+  return NULL;
 }
 
 double error(double estimate)
@@ -63,6 +67,7 @@ int main()
   rmk_thread_join(worker1);
 
   printf("Worker1 estimates: %.10lf, error: %.10lf\n", result1, error(result1));
+  fflush(stdout);
 
   rmk_sleep_ms(100);
 
@@ -70,6 +75,7 @@ int main()
   rmk_thread_join(worker2);
 
   printf("Worker2 estimates: %.10lf, error: %.10lf\n", result2, error(result2));
+  fflush(stdout);
 
   rmk_sleep_ms(1000);
 
@@ -77,6 +83,7 @@ int main()
   rmk_thread_join(worker3);
 
   printf("Worker3 estimates: %.10lf, error: %.10lf\n", result3, error(result3));
+  fflush(stdout);
 
   rmk_thread_shutdown();
 

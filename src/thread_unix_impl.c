@@ -53,11 +53,11 @@ bool rmk_thread_create(
   pthread_attr_t attr;
   pthread_attr_init(&attr);
 
-  if (flags == RMK_JOINABLE)
+  if (flags & RMK_JOINABLE)
   {
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
   }
-  else if (flags == RMK_DETACHED)
+  else if (flags & RMK_DETACHED)
   {
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
   }
